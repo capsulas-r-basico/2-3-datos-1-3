@@ -1,2 +1,2 @@
-# datos-1-3
-clase n°3 de datos I
+# datos-1-2
+clase n°2 de datos I

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>R and databases</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <meta name="date" content="2023-06-12" />
+    <script src="datos-1-2_files/header-attrs-2.22/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: center, middle
+
+.linea-superior[]
+.linea-inferior[]
+
+&lt;img src="imagenes/logo_portada2.png" width="200" /&gt;
+
+## INE Educa: Clases abiertas de R
+
+## Proyecto Ciencia de Datos
+
+### Mayo 2023
+
+
+
+
+ 
+
+---
+
+name: diapo-basica
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Trabajo básico con filas
+---
+
+template: diapo-basica
+
+Una vez logramos cargar los datos con los que trabajamos, vamos a querer 
+explorarlos, cortarlos, modificarlos. Para estas tareas, utilizaremos el paquete
+dplyr:
+
+  &lt;img src="imagenes/logo_dplyr.png" style="width:20%; margin-right:20px;" /&gt;
+
+Para esta cápsula nos centraremos en la familia de funciones `slice` y en la función `filter`. 
+
+
+---
+
+template: diapo-basica
+
+## Slicing
+
+El _slicing_ se refiere a seleccionar un subconjunto de los elementos de un objeto.
+
+En nuestro caso, queremos seleccionar un número determinado de filas. Para ejemplificar,
+volvamos a carga la tabla `hospital.csv`. Aprovechamos de traducir las columnas al español:
+
+
+```r
+library(readr)
+
+
+hospital &lt;- read_csv(file = "data/hospital.csv")
+names(hospital) = c('Número', 'Ciudad', 'Género', 'Edad', 'Ingreso', 'Enfermedad')
+```
+Si quisiéramos imprimir la tabla, esto sería demandante para R, pues tiene 150.000 filas.
+
+---
+template: diapo-basica
+
+## Slicing
+
+Una alternativa para explorar las primeras filas de una tabla es usar la función `slice_head`,
+que nos entrega los n primeros elementos de un dataframe:
+
+
+```r
+hospital %&gt;% slice_head(n = 5)
+```
+
+```
+## # A tibble: 5 x 6
+##   Número Ciudad Género  Edad Ingreso Enfermedad
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+## 1      1 Dallas Male      41   40367 No        
+## 2      2 Dallas Male      54   45084 No        
+## 3      3 Dallas Male      42   52483 No        
+## 4      4 Dallas Male      40   40941 No        
+## 5      5 Dallas Male      46   50289 No
+```
+
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos los últimos n elementos usamos `slice_tail`:
+
+
+
+```r
+hospital %&gt;% slice_tail(n = 3)
+```
+
+```
+## # A tibble: 3 x 6
+##   Número Ciudad Género  Edad Ingreso Enfermedad
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+## 1 149998 Austin Male      26  111885 No        
+## 2 149999 Austin Male      25  111878 No        
+## 3 150000 Austin Female    37   87251 No
+```
+
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos una muestra aleatoria de n elementos usamos `slice_sample`:
+
+
+
+```r
+hospital %&gt;% slice_sample(n = 3)
+```
+
+```
+## # A tibble: 3 x 6
+##   Número Ciudad        Género  Edad Ingreso Enfermedad
+##    &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+## 1 134389 San Diego     Male      35  115405 No        
+## 2 146335 Austin        Male      31   90347 No        
+## 3  30543 New York City Female    60   95283 No
+```
+
+
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos una muestra aleatoria de n elementos usamos `slice_sample`:
+
+
+
+```r
+hospital %&gt;% slice_sample(n = 3)
+```
+
+```
+## # A tibble: 3 x 6
+##   Número Ciudad          Género  Edad Ingreso Enfermedad
+##    &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+## 1  15793 Dallas          Female    63   41074 No        
+## 2 130817 Washington D.C. Female    46   82075 No        
+## 3  61340 New York City   Female    27   96068 No
+```
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos una selección propia de elementos usamos `slice`:
+
+
+
+```r
+hospital %&gt;% slice(3:7)
+```
+
+```
+## # A tibble: 5 x 6
+##   Número Ciudad Género  Edad Ingreso Enfermedad
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+## 1      3 Dallas Male      42   52483 No        
+## 2      4 Dallas Male      40   40941 No        
+## 3      5 Dallas Male      46   50289 No        
+## 4      6 Dallas Female    36   50786 No        
+## 5      7 Dallas Female    32   33155 No
+```
+--
+
+En este caso usamos la notación `a:b`, que en el ejemplo significa "quiero todos
+los elementos desde el 3 hasta el 7", es decir, los elementos 3, 4, 5, 6 y 7.
+
+---
+template: diapo-basica
+
+## Filter
+
+Muchas veces no queremos una selección de filas por su posición, sino que queremos que cumplan cierta condición. Los métodos de _slicing_ no son de ayuda aquí. Para estos casos utilizaremos la función `filter`.
+
+¿Cómo puedo seleccionar las personas que están enfermas?
+--
+
+
+
+```r
+hospital %&gt;% filter(Enfermedad == 'Yes') %&gt;% slice_head(n = 5)
+```
+
+```
+## # A tibble: 5 x 6
+##   Número Ciudad Género  Edad Ingreso Enfermedad
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+## 1     11 Dallas Female    48   41524 Yes       
+## 2     18 Dallas Male      38   46373 Yes       
+## 3     24 Dallas Female    27   34292 Yes       
+## 4     30 Dallas Male      45   47421 Yes       
+## 5     39 Dallas Female    61   39881 Yes
+```
+--
+Seguimos usando `slice_head` para controlar el tamaño de la tabla.
+
+---
+template: diapo-basica
+
+
+
+## `filter` y operadores lógicos
+
+En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
+dos valores. Otros operadores lógicos de uso común son:
+
+- `!=` distinto a.
+- `&gt;`, `&gt;=` mayor a y mayor o igual a.
+-  mayor o igual a.
+- `&lt;`, `&lt;=` menor y menor o igual a.
+
+--
+
+Probemos algunas de estas condiciones:
+
+Personas con 41 o más años.
+
+
+```r
+hospital %&gt;% filter(Edad &gt;= 41) %&gt;% slice_head(n = 4)
+```
+--
+
+| Número|Ciudad |Género | Edad| Ingreso|Enfermedad |
+|------:|:------|:------|----:|-------:|:----------|
+|      1|Dallas |Male   |   41|   40367|No         |
+|      2|Dallas |Male   |   54|   45084|No         |
+|      3|Dallas |Male   |   42|   52483|No         |
+|      5|Dallas |Male   |   46|   50289|No         |
+
+---
+
+template: diapo-basica
+
+
+
+## `filter` y operadores lógicos
+
+En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
+dos valores. Otros operadores lógicos de uso común son:
+
+- `!=` distinto a.
+- `&gt;`, `&gt;=` mayor a y mayor o igual a.
+-  mayor o igual a.
+- `&lt;`, `&lt;=` menor y menor o igual a.
+
+
+
+Probemos algunas de estas condiciones:
+
+Personas mayores a 41 años.
+
+
+```r
+hospital %&gt;% filter(Edad &gt; 41) %&gt;% slice_head(n = 4)
+```
+--
+
+| Número|Ciudad |Género | Edad| Ingreso|Enfermedad |
+|------:|:------|:------|----:|-------:|:----------|
+|      2|Dallas |Male   |   54|   45084|No         |
+|      3|Dallas |Male   |   42|   52483|No         |
+|      5|Dallas |Male   |   46|   50289|No         |
+|      9|Dallas |Male   |   51|   68667|No         |
+---
+
+template: diapo-basica
+
+
+
+## `filter` y operadores lógicos
+
+En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
+dos valores. Otros operadores lógicos de uso común son:
+
+- `!=` distinto a.
+- `&gt;`, `&gt;=` mayor a y mayor o igual a.
+-  mayor o igual a.
+- `&lt;`, `&lt;=` menor y menor o igual a.
+
+
+Probemos algunas de estas condiciones:
+
+Personas cuyo sexo no es masculino.
+
+```r
+hospital %&gt;% filter(Género != 'Male') %&gt;% slice_head(n = 4)
+```
+--
+
+| Número|Ciudad |Género | Edad| Ingreso|Enfermedad |
+|------:|:------|:------|----:|-------:|:----------|
+|      6|Dallas |Female |   36|   50786|No         |
+|      7|Dallas |Female |   32|   33155|No         |
+|     10|Dallas |Female |   30|   50082|No         |
+|     11|Dallas |Female |   48|   41524|Yes        |
+---
+template: diapo-basica
+
+## `filter` y operadores lógicos
+
+También podríamos querer que se cumpla más de una condición o bien alguna condición de varias. Para esto tenemos los operadores lógicos "&amp;" y "|":
+
+- `condicion1 &amp; condicion2` operador "y", mantenemos filas que cumplen las dos condiciones al mismo tiempo.
+- `condicion1 | condicion2` operador "o", mantenemos filas que cumplen cualquiera de las condiciones.
+
+--
+
+Hombres mayores de 64 años:
+
+
+```r
+hospital %&gt;% filter(Género == 'Male' &amp; Edad &gt; 64)
+```
+--
+
+| Número|Ciudad |Género | Edad| Ingreso|Enfermedad |
+|------:|:------|:------|----:|-------:|:----------|
+|    405|Dallas |Male   |   65|   54304|No         |
+|    470|Dallas |Male   |   65|   52691|No         |
+|    834|Dallas |Male   |   65|   49903|No         |
+|   1045|Dallas |Male   |   65|   78511|No         |
+
+---
+template: diapo-basica
+
+## `filter` y operadores lógicos
+
+También podríamos querer que se cumpla más de una condición o bien alguna condición de varias. Para esto tenemos los operadores lógicos "&amp;" y "|":
+
+- `condicion1 &amp; condicion2` operador "y", mantenemos filas que cumplen las dos condiciones al mismo tiempo.
+- `condicion1 | condicion2` operador "o", mantenemos filas que cumplen cualquiera de las condiciones.
+
+--
+
+Mujeres en Dallas o Boston:
+
+
+```r
+hospital %&gt;% filter(Género == 'Female' &amp; (Ciudad == 'Boston' | Ciudad == 'Dallas'))
+```
+--
+
+| Número|Ciudad |Género | Edad| Ingreso|Enfermedad |
+|------:|:------|:------|----:|-------:|:----------|
+| 121761|Boston |Female |   46|   82686|No         |
+|   1068|Dallas |Female |   54|   43645|No         |
+|  18492|Dallas |Female |   34|   21219|No         |
+|  15284|Dallas |Female |   64|   45062|No         |
+
+---
+
+
+
+class: center, middle
+
+.linea-superior[]
+.linea-inferior[]
+
+&lt;img src="imagenes/logo_portada2.png" width="200" /&gt;
+
+
+## INE Educa: Clases abiertas de R
+
+## Proyecto Ciencia de Datos
+
+### Mayo 2023
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "13:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

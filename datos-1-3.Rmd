@@ -1,0 +1,335 @@
+---
+title: "R and databases"
+subtitle: "calidad"
+author: 
+date: '`r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    seal: false
+    #lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: False
+      ratio: '13:9'
+---
+
+class: center, middle
+
+.linea-superior[]
+.linea-inferior[]
+
+<img src="imagenes/logo_portada2.png" width="200" />
+
+## INE Educa: Clases abiertas de R
+
+## Proyecto Ciencia de Datos
+
+### Mayo 2023
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = TRUE)
+knitr::opts_chunk$set(message = FALSE, warning = F, eval = T) 
+options(scipen = "999")
+
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+library(dplyr)
+library(magrittr)
+
+```
+ 
+
+---
+
+name: diapo-basica
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Trabajo básico con filas
+---
+
+template: diapo-basica
+
+Una vez logramos cargar los datos con los que trabajamos, vamos a querer 
+explorarlos, cortarlos, modificarlos. Para estas tareas, utilizaremos el paquete
+dplyr:
+
+  <img src="imagenes/logo_dplyr.png" style="width:20%; margin-right:20px;" />
+
+Para esta cápsula nos centraremos en la familia de funciones `slice` y en la función `filter`. 
+
+
+---
+
+template: diapo-basica
+
+## Slicing
+
+El _slicing_ se refiere a seleccionar un subconjunto de los elementos de un objeto.
+
+En nuestro caso, queremos seleccionar un número determinado de filas. Para ejemplificar,
+volvamos a carga la tabla `hospital.csv`. Aprovechamos de traducir las columnas al español:
+
+```{r, warning=FALSE, eval=TRUE}
+library(readr)
+
+
+hospital <- read_csv(file = "data/hospital.csv")
+names(hospital) = c('Número', 'Ciudad', 'Género', 'Edad', 'Ingreso', 'Enfermedad')
+```
+Si quisiéramos imprimir la tabla, esto sería demandante para R, pues tiene 150.000 filas.
+
+---
+template: diapo-basica
+
+## Slicing
+
+Una alternativa para explorar las primeras filas de una tabla es usar la función `slice_head`,
+que nos entrega los n primeros elementos de un dataframe:
+
+```{r, warning=FALSE, eval=TRUE, echo = T}
+hospital %>% slice_head(n = 5)
+
+```
+
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos los últimos n elementos usamos `slice_tail`:
+
+
+```{r, warning=FALSE, eval=TRUE, echo = T}
+hospital %>% slice_tail(n = 3)
+
+```
+
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos una muestra aleatoria de n elementos usamos `slice_sample`:
+
+
+```{r, warning=FALSE, eval=TRUE, echo = T}
+hospital %>% slice_sample(n = 3)
+
+```
+
+
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos una muestra aleatoria de n elementos usamos `slice_sample`:
+
+
+```{r, warning=FALSE, eval=TRUE, echo = T}
+hospital %>% slice_sample(n = 3)
+
+```
+---
+template: diapo-basica
+
+## Slicing
+
+Si queremos una selección propia de elementos usamos `slice`:
+
+
+```{r, warning=FALSE, eval=TRUE, echo = T}
+hospital %>% slice(3:7)
+
+```
+--
+
+En este caso usamos la notación `a:b`, que en el ejemplo significa "quiero todos
+los elementos desde el 3 hasta el 7", es decir, los elementos 3, 4, 5, 6 y 7.
+
+---
+template: diapo-basica
+
+## Filter
+
+Muchas veces no queremos una selección de filas por su posición, sino que queremos que cumplan cierta condición. Los métodos de _slicing_ no son de ayuda aquí. Para estos casos utilizaremos la función `filter`.
+
+¿Cómo puedo seleccionar las personas que están enfermas?
+--
+
+
+```{r, warning=FALSE, eval=T, echo = T}
+hospital %>% filter(Enfermedad == 'Yes') %>% slice_head(n = 5)
+ 
+```
+--
+Seguimos usando `slice_head` para controlar el tamaño de la tabla.
+
+---
+template: diapo-basica
+
+
+
+## `filter` y operadores lógicos
+
+En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
+dos valores. Otros operadores lógicos de uso común son:
+
+- `!=` distinto a.
+- `>`, `>=` mayor a y mayor o igual a.
+-  mayor o igual a.
+- `<`, `<=` menor y menor o igual a.
+
+--
+
+Probemos algunas de estas condiciones:
+
+Personas con 41 o más años.
+
+```{r, warning=FALSE, eval=FALSE, echo=T}
+hospital %>% filter(Edad >= 41) %>% slice_head(n = 4)
+
+```
+--
+```{r, warning=FALSE, eval=TRUE, echo=FALSE}
+knitr::kable(hospital %>% filter(Edad >= 41) %>% slice_head(n = 4))
+
+```
+
+---
+
+template: diapo-basica
+
+
+
+## `filter` y operadores lógicos
+
+En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
+dos valores. Otros operadores lógicos de uso común son:
+
+- `!=` distinto a.
+- `>`, `>=` mayor a y mayor o igual a.
+-  mayor o igual a.
+- `<`, `<=` menor y menor o igual a.
+
+
+
+Probemos algunas de estas condiciones:
+
+Personas mayores a 41 años.
+
+```{r, warning=FALSE, eval=FALSE, echo = T}
+hospital %>% filter(Edad > 41) %>% slice_head(n = 4)
+
+```
+--
+```{r, warning=FALSE, eval=TRUE, echo=F}
+knitr::kable(hospital %>% filter(Edad > 41) %>% slice_head(n = 4))
+
+```
+---
+
+template: diapo-basica
+
+
+
+## `filter` y operadores lógicos
+
+En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
+dos valores. Otros operadores lógicos de uso común son:
+
+- `!=` distinto a.
+- `>`, `>=` mayor a y mayor o igual a.
+-  mayor o igual a.
+- `<`, `<=` menor y menor o igual a.
+
+
+Probemos algunas de estas condiciones:
+
+Personas cuyo sexo no es masculino.
+```{r, warning=FALSE, eval=FALSE, echo = T}
+hospital %>% filter(Género != 'Male') %>% slice_head(n = 4)
+
+```
+--
+```{r, warning=FALSE, eval=TRUE, echo=F}
+knitr::kable(hospital %>% filter(Género != 'Male') %>% slice_head(n = 4))
+
+```
+---
+template: diapo-basica
+
+## `filter` y operadores lógicos
+
+También podríamos querer que se cumpla más de una condición o bien alguna condición de varias. Para esto tenemos los operadores lógicos "&" y "|":
+
+- `condicion1 & condicion2` operador "y", mantenemos filas que cumplen las dos condiciones al mismo tiempo.
+- `condicion1 | condicion2` operador "o", mantenemos filas que cumplen cualquiera de las condiciones.
+
+--
+
+Hombres mayores de 64 años:
+
+```{r, warning=FALSE, eval=FALSE, echo = T}
+hospital %>% filter(Género == 'Male' & Edad > 64)
+
+```
+--
+```{r, warning=FALSE, eval=TRUE, echo=F}
+knitr::kable(hospital %>% filter(Género == 'Male' & Edad > 64) %>% slice_head(n = 4))
+
+```
+
+---
+template: diapo-basica
+
+## `filter` y operadores lógicos
+
+También podríamos querer que se cumpla más de una condición o bien alguna condición de varias. Para esto tenemos los operadores lógicos "&" y "|":
+
+- `condicion1 & condicion2` operador "y", mantenemos filas que cumplen las dos condiciones al mismo tiempo.
+- `condicion1 | condicion2` operador "o", mantenemos filas que cumplen cualquiera de las condiciones.
+
+--
+
+Mujeres en Dallas o Boston:
+
+```{r, warning=FALSE, eval=FALSE, echo = T}
+hospital %>% filter(Género == 'Female' & (Ciudad == 'Boston' | Ciudad == 'Dallas'))
+
+```
+--
+```{r, warning=FALSE, eval=TRUE, echo=F}
+knitr::kable(hospital %>% filter(Género == 'Female' &
+                                   (Ciudad == 'Boston' |
+                                      Ciudad == 'Dallas') ) %>% slice_sample(n = 4))
+
+```
+
+---
+
+
+
+class: center, middle
+
+.linea-superior[]
+.linea-inferior[]
+
+<img src="imagenes/logo_portada2.png" width="200" />
+
+
+## INE Educa: Clases abiertas de R
+
+## Proyecto Ciencia de Datos
+
+### Mayo 2023
+
+
+
+
