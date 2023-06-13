@@ -310,7 +310,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   color: red;
 }
 
-p { margin:0 }
+
 
 .big{
   font-size: var(--header-big-font-size);

@@ -32,6 +32,7 @@ class: center, middle
 options(htmltools.dir.version = TRUE)
 knitr::opts_chunk$set(message = FALSE, warning = F, eval = T) 
 options(scipen = "999")
+options(knitr.table.format = "html")
 
 ```
 
@@ -39,7 +40,7 @@ options(scipen = "999")
 library(xaringanthemer)
 library(dplyr)
 library(magrittr)
-
+# library(kableExtra)
 ```
  
 
@@ -50,267 +51,187 @@ background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Trabajo básico con filas
+# Trabajo básico con columnas
 ---
 
 template: diapo-basica
 
-Una vez logramos cargar los datos con los que trabajamos, vamos a querer 
-explorarlos, cortarlos, modificarlos. Para estas tareas, utilizaremos el paquete
-dplyr:
+Muchas veces las tablas con las que trabajamos contienen más columnas de las que necesitamos,
+por lo que nos interesa hacer una selección de estas.
 
-  <img src="imagenes/logo_dplyr.png" style="width:20%; margin-right:20px;" />
+la función `select` nos ayudará en estas situaciones.
 
-Para esta cápsula nos centraremos en la familia de funciones `slice` y en la función `filter`. 
-
-
----
-
-template: diapo-basica
-
-## Slicing
-
-El _slicing_ se refiere a seleccionar un subconjunto de los elementos de un objeto.
-
-En nuestro caso, queremos seleccionar un número determinado de filas. Para ejemplificar,
-volvamos a carga la tabla `hospital.csv`. Aprovechamos de traducir las columnas al español:
-
-```{r, warning=FALSE, eval=TRUE}
-library(readr)
-
-
-hospital <- read_csv(file = "data/hospital.csv")
-names(hospital) = c('Número', 'Ciudad', 'Género', 'Edad', 'Ingreso', 'Enfermedad')
-```
-Si quisiéramos imprimir la tabla, esto sería demandante para R, pues tiene 150.000 filas.
+.center[
+<img src="imagenes/select.png" width="300" />]
 
 ---
 template: diapo-basica
 
-## Slicing
-
-Una alternativa para explorar las primeras filas de una tabla es usar la función `slice_head`,
-que nos entrega los n primeros elementos de un dataframe:
-
-```{r, warning=FALSE, eval=TRUE, echo = T}
-hospital %>% slice_head(n = 5)
-
-```
-
----
-template: diapo-basica
-
-## Slicing
-
-Si queremos los últimos n elementos usamos `slice_tail`:
-
-
-```{r, warning=FALSE, eval=TRUE, echo = T}
-hospital %>% slice_tail(n = 3)
-
-```
-
----
-template: diapo-basica
-
-## Slicing
-
-Si queremos una muestra aleatoria de n elementos usamos `slice_sample`:
-
-
-```{r, warning=FALSE, eval=TRUE, echo = T}
-hospital %>% slice_sample(n = 3)
-
-```
-
-
----
-template: diapo-basica
-
-## Slicing
-
-Si queremos una muestra aleatoria de n elementos usamos `slice_sample`:
-
-
-```{r, warning=FALSE, eval=TRUE, echo = T}
-hospital %>% slice_sample(n = 3)
-
-```
----
-template: diapo-basica
-
-## Slicing
-
-Si queremos una selección propia de elementos usamos `slice`:
-
-
-```{r, warning=FALSE, eval=TRUE, echo = T}
-hospital %>% slice(3:7)
-
-```
---
-
-En este caso usamos la notación `a:b`, que en el ejemplo significa "quiero todos
-los elementos desde el 3 hasta el 7", es decir, los elementos 3, 4, 5, 6 y 7.
-
----
-template: diapo-basica
-
-## Filter
-
-Muchas veces no queremos una selección de filas por su posición, sino que queremos que cumplan cierta condición. Los métodos de _slicing_ no son de ayuda aquí. Para estos casos utilizaremos la función `filter`.
-
-¿Cómo puedo seleccionar las personas que están enfermas?
---
-
-
-```{r, warning=FALSE, eval=T, echo = T}
-hospital %>% filter(Enfermedad == 'Yes') %>% slice_head(n = 5)
+Para el ejemplo cargaremos la tabla `ejemplo_select.xlsx`
+```{r, eval=T, echo=F}
+tabla = readxl::read_excel('data/ejemplo_select.xlsx')
  
 ```
---
-Seguimos usando `slice_head` para controlar el tamaño de la tabla.
 
----
-template: diapo-basica
-
-
-
-## `filter` y operadores lógicos
-
-En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
-dos valores. Otros operadores lógicos de uso común son:
-
-- `!=` distinto a.
-- `>`, `>=` mayor a y mayor o igual a.
--  mayor o igual a.
-- `<`, `<=` menor y menor o igual a.
-
---
-
-Probemos algunas de estas condiciones:
-
-Personas con 41 o más años.
-
-```{r, warning=FALSE, eval=FALSE, echo=T}
-hospital %>% filter(Edad >= 41) %>% slice_head(n = 4)
-
-```
---
-```{r, warning=FALSE, eval=TRUE, echo=FALSE}
-knitr::kable(hospital %>% filter(Edad >= 41) %>% slice_head(n = 4))
-
-```
-
----
-
-template: diapo-basica
-
-
-
-## `filter` y operadores lógicos
-
-En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
-dos valores. Otros operadores lógicos de uso común son:
-
-- `!=` distinto a.
-- `>`, `>=` mayor a y mayor o igual a.
--  mayor o igual a.
-- `<`, `<=` menor y menor o igual a.
-
-
-
-Probemos algunas de estas condiciones:
-
-Personas mayores a 41 años.
-
-```{r, warning=FALSE, eval=FALSE, echo = T}
-hospital %>% filter(Edad > 41) %>% slice_head(n = 4)
-
-```
---
-```{r, warning=FALSE, eval=TRUE, echo=F}
-knitr::kable(hospital %>% filter(Edad > 41) %>% slice_head(n = 4))
-
-```
----
-
-template: diapo-basica
-
-
-
-## `filter` y operadores lógicos
-
-En el ejemplo anterior utilizamos el operador lógico `==`, que significa igualdad entre
-dos valores. Otros operadores lógicos de uso común son:
-
-- `!=` distinto a.
-- `>`, `>=` mayor a y mayor o igual a.
--  mayor o igual a.
-- `<`, `<=` menor y menor o igual a.
-
-
-Probemos algunas de estas condiciones:
-
-Personas cuyo sexo no es masculino.
-```{r, warning=FALSE, eval=FALSE, echo = T}
-hospital %>% filter(Género != 'Male') %>% slice_head(n = 4)
-
-```
---
-```{r, warning=FALSE, eval=TRUE, echo=F}
-knitr::kable(hospital %>% filter(Género != 'Male') %>% slice_head(n = 4))
-
-```
----
-template: diapo-basica
-
-## `filter` y operadores lógicos
-
-También podríamos querer que se cumpla más de una condición o bien alguna condición de varias. Para esto tenemos los operadores lógicos "&" y "|":
-
-- `condicion1 & condicion2` operador "y", mantenemos filas que cumplen las dos condiciones al mismo tiempo.
-- `condicion1 | condicion2` operador "o", mantenemos filas que cumplen cualquiera de las condiciones.
-
---
-
-Hombres mayores de 64 años:
-
-```{r, warning=FALSE, eval=FALSE, echo = T}
-hospital %>% filter(Género == 'Male' & Edad > 64)
-
-```
---
-```{r, warning=FALSE, eval=TRUE, echo=F}
-knitr::kable(hospital %>% filter(Género == 'Male' & Edad > 64) %>% slice_head(n = 4))
-
+```{r, eval=T, echo=F}
+knitr::kable(tabla)
 ```
 
 ---
 template: diapo-basica
 
-## `filter` y operadores lógicos
+¿Qué formas tenemos para seleccionar columnas?
+```{r xaringan-themer-2, include=FALSE, warning=FALSE}
 
-También podríamos querer que se cumpla más de una condición o bien alguna condición de varias. Para esto tenemos los operadores lógicos "&" y "|":
+xaringanExtra::use_panelset()
+```
 
-- `condicion1 & condicion2` operador "y", mantenemos filas que cumplen las dos condiciones al mismo tiempo.
-- `condicion1 | condicion2` operador "o", mantenemos filas que cumplen cualquiera de las condiciones.
 
+.panelset[
+.panel[.panel-name[nombres]
+
+Por nombre:
+
+```{r, echo=T, eval=F}
+tabla %>% select(id, categoria_1, categoria_2)
+
+```
+
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% select(id, categoria_1, categoria_2))
+```
+
+Seleccionamos columnas `id`, `categoria_1` y `categoria_2`
+
+]
+.panel[.panel-name[posiciones]
+Por posición:
+
+```{r, echo=T, eval=F}
+tabla %>% select(1, 2, 4)
+```
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% select(1, 2, 4 ))
+```
+
+En este caso seleccionamos las columnas n°1, 2 y 4, según el orden que tengan de izquierda a derecha
+]
+.panel[.panel-name[rango]
+Por rango:
+
+```{r, echo=T, eval=F}
+tabla %>% select(id:categoria_3)
+```
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% select(id:categoria_3))
+```
+
+En este caso seleccionamos desde la columna `id` hasta `categoria_3`, según el orden que tengan de izquierda a derecha
+]
+.panel[.panel-name[seleccion_negativa]
+Selección negativa:
+
+```{r, echo=T, eval=F}
+tabla %>% select(-id, -categoria_2)
+```
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% select(-id, -categoria_2))
+```
+
+Con la selección negativa seleccionamos todas las columnas menos las especificadas. En este caso, seleccionamos todas menos `id` y `categoria_2`.
+]
+]
+---
+template: diapo-basica
+
+## starts_with
+
+Si queremos seleccionar todas las columnas que empiecen con los mismos carácteres, podemos usar
+`starts_with()` dentro del `select()`. Obtengamos la columna id y todas las categorías:
 --
 
-Mujeres en Dallas o Boston:
-
-```{r, warning=FALSE, eval=FALSE, echo = T}
-hospital %>% filter(Género == 'Female' & (Ciudad == 'Boston' | Ciudad == 'Dallas'))
+```{r, echo=T, eval=F}
+tabla %>% select(id, starts_with('categoria'))
 
 ```
 --
-```{r, warning=FALSE, eval=TRUE, echo=F}
-knitr::kable(hospital %>% filter(Género == 'Female' &
-                                   (Ciudad == 'Boston' |
-                                      Ciudad == 'Dallas') ) %>% slice_sample(n = 4))
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% select(id, starts_with('categoria')))
+```
+
+---
+
+template: diapo-basica
+
+## ends_with
+
+También podríamos querer seleccionar las columnas que terminen con un conjunto de carácteres.
+En este caso usamos `ends_with()` dentro del `select()`. Obtengamos la columna id y todas las columnas
+terminadas en "_1":
+--
+
+```{r, echo=T, eval=F}
+tabla %>% select(id, ends_with('_1'))
 
 ```
+--
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% select(id,  ends_with('_1')))
+```
+
+---
+
+template: diapo-basica
+
+## contains
+
+Por último, podríamos querer seleccionar las columnas que contengan un conjunto de carácteres.
+En este caso usamos `contains()` dentro del `select()`. Todas las columnas que contengan el caracter "_":
+--
+
+```{r, echo=T, eval=F}
+tabla %>% select(contains('_'))
+
+```
+--
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% select(contains('_')))
+```
+
+
+---
+
+
+template: diapo-basica
+
+## rename
+
+Otra necesidad común es cambiar los nombres de las variables por unos más prácticos. Para esto
+utilizamos la función `rename` que tiene la siguiente sintaxis:
+
+```{r, eval=F}
+rename(data.frame, nombre_nuevo1 = nombre_viejo1, nombre_nuevo2 = nombre_viejo2, ...)
+```
+--
+Probemos a renombrar las columnas de categorías a `cat_1`, `cat_2`, `cat_3`:
+
+```{r, eval=F}
+tabla %>% rename(cat_1 = categoria_1, cat_2 = categoria_2, cat_3 = categoria_3)
+```
+--
+
+```{r, eval=T, echo=F}
+knitr::kable(tabla %>% rename(cat_1 = categoria_1, cat_2 = categoria_2, cat_3 = categoria_3))
+```
+
+
 
 ---
 
