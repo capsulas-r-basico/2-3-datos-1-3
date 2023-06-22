@@ -26,7 +26,9 @@ class: center, middle
 
 ## Proyecto Ciencia de Datos
 
-### Mayo 2023
+## Trabajo básico con columnas
+
+### Julio 2023
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = TRUE)
@@ -249,7 +251,9 @@ class: center, middle
 
 ## Proyecto Ciencia de Datos
 
-### Mayo 2023
+## Trabajo básico con columnas
+
+### Julio 2023
 
 
 
