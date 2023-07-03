@@ -70,7 +70,7 @@ la función `select` nos ayudará en estas situaciones.
 template: diapo-basica
 
 Para el ejemplo cargaremos la tabla `ejemplo_select.xlsx`
-```{r, eval=T, echo=F}
+```{r, eval=T, echo=T}
 tabla = readxl::read_excel('data/ejemplo_select.xlsx')
  
 ```
